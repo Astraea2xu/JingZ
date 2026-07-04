@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="镜舟：把一个创意变成剧本、角色、分镜与生成提示词的本地视频创作 Agent。"
+    />
+    <title>镜舟 · 视频故事创作 Agent</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+        <div>
+          <strong>镜舟</strong>
+          <small>CREATIVE AGENT</small>
+        </div>
+      </div>
+
+      <button class="new-project" id="newProjectButton" type="button">
+        <span>＋</span> 新建创作
+      </button>
+
+      <div class="side-label">最近项目</div>
+      <nav class="project-list" id="projectList" aria-label="最近项目">
+        <div class="empty-history">还没有项目<br />从一个念头开始吧</div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="model-indicator">
+          <i id="modelDot"></i>
+          <span id="modelLabel">正在读取模型状态…</span>
+        </div>
+        <span>所有项目默认保存在本机</span>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div>
+          <span class="eyebrow">FROM SPARK TO SCREEN</span>
+          <h1 id="pageTitle">把念头，驶向画面。</h1>
+        </div>
+        <div class="top-actions">
+          <button class="primary small hidden" id="produceVideoButton" type="button">生成视频</button>
+          <button class="ghost hidden" id="downloadJsonButton" type="button">导出 JSON</button>
+          <button class="ghost hidden" id="downloadMarkdownButton" type="button">导出制作单</button>
+          <button class="ghost danger hidden" id="deleteProjectButton" type="button">删除项目</button>
+        </div>
+      </header>
+
+      <section class="composer" id="composerSection">
+        <div class="hero-copy">
+          <p>
+            说出一个故事、一个产品，或一条还没想明白的灵感。镜舟会替你完成创意诊断、剧本、
+            角色设定与逐镜头生产计划。
+          </p>
+        </div>
+
+        <div class="mode-grid" id="modeGrid">
+          <button class="mode-card active" data-mode="short_drama" type="button">
+            <span class="mode-index">01</span>
+            <strong>短剧 Agent</strong>
+            <small>冲突、角色、反转与完整分镜</small>
+          </button>
+          <button class="mode-card" data-mode="smart_video" type="button">
+            <span class="mode-index">02</span>
+            <strong>智能成片</strong>
+            <small>从主题到旁白与镜头清单</small>
+          </button>
+          <button class="mode-card" data-mode="digital_human" type="button">
+            <span class="mode-index">03</span>
+            <strong>数字人口播</strong>
+            <small>口播稿、节奏与 B-roll 建议</small>
+          </button>
+          <button class="mode-card" data-mode="visual_design" type="button">
+            <span class="mode-index">04</span>
+            <strong>视觉设计</strong>
+            <small>封面、海报与关键帧方向</small>
+          </button>
+          <button class="mode-card" data-mode="viral_remix" type="button">
+            <span class="mode-index">05</span>
+            <strong>灵感重构</strong>
+            <small>提取结构，生成原创表达</small>
+          </button>
+        </div>
+
+        <form class="prompt-panel" id="creativeForm">
+          <label for="ideaInput">你的创意</label>
+          <textarea
+            id="ideaInput"
+            maxlength="8000"
+            placeholder="例如：一个每天替别人保存记忆的修表匠，某天发现自己的童年正被陌生人逐帧买走……"
+            required
+          ></textarea>
+          <div class="prompt-bottom">
+            <div class="quick-fields">
+              <label>
+                <span>受众</span>
+                <input id="audienceInput" value="18–35 岁故事类短视频用户" />
+              </label>
+              <label>
+                <span>时长</span>
+                <select id="durationInput">
+                  <option value="15">15 秒</option>
+                  <option value="30">30 秒</option>
+                  <option value="60" selected>60 秒</option>
+                  <option value="90">90 秒</option>
+                  <option value="180">3 分钟</option>
+                </select>
+              </label>
+              <label>
+                <span>画幅</span>
+                <select id="aspectInput">
+                  <option value="9:16" selected>9:16 竖屏</option>
+                  <option value="16:9">16:9 横屏</option>
+                  <option value="1:1">1:1 方形</option>
+                  <option value="4:3">4:3 经典</option>
+                </select>
+              </label>
+              <button class="advanced-toggle" id="advancedToggle" type="button">更多设定</button>
+            </div>
+            <button class="generate-button" id="generateButton" type="submit">
+              <span>开始构思</span><b>↗</b>
+            </button>
+          </div>
+          <div class="advanced-fields hidden" id="advancedFields">
+            <label>
+              <span>视觉风格</span>
+              <input id="styleInput" value="电影感写实，克制的色彩与自然光" />
+            </label>
+            <label>
+              <span>情绪语气</span>
+              <input id="toneInput" value="悬念渐进，结尾留有余韵" />
+            </label>
+            <label class="wide">
+              <span>额外要求</span>
+              <input id="requirementsInput" placeholder="角色数量、禁用元素、品牌信息等" />
+            </label>
+            <label class="wide auto-assets-setting">
+              <input id="autoAssetsInput" type="checkbox" checked />
+              <span>初始化后调用图片工具，自动生成角色与场景参考图（产生图片 API 费用）</span>
+            </label>
+          </div>
+        </form>
+
+        <div class="principles">
+          <span>原创重构</span><span>角色连续性</span><span>逐镜头可执行</span><span>模型可替换</span>
+        </div>
+      </section>
+
+      <section class="loading-view hidden" id="loadingView" aria-live="polite">
+        <div class="orbit" aria-hidden="true"><i></i><i></i><i></i></div>
+        <span class="eyebrow">THE CREW IS THINKING</span>
+        <h2>正在组织这支看不见的剧组</h2>
+        <p id="loadingStep">先寻找值得被看见的那个瞬间…</p>
+      </section>
+
+      <section class="workspace hidden" id="workspaceSection">
+        <div class="project-hero">
+          <div>
+            <span class="pill" id="projectMode"></span>
+            <h2 id="projectTitle"></h2>
+            <p id="projectLogline"></p>
+          </div>
+          <div class="duration-stamp">
+            <strong id="projectDuration">60</strong>
+            <span>SEC</span>
+          </div>
+        </div>
+
+        <nav class="tabs" id="resultTabs">
+          <button class="active" data-tab="overview" type="button">创意总览</button>
+          <button data-tab="script" type="button">剧本</button>
+          <button data-tab="chat" type="button">对话编辑</button>
+          <button data-tab="characters" type="button">角色和场景</button>
+          <button data-tab="assets" type="button">资产库</button>
+          <button data-tab="storyboard" type="button">分镜</button>
+          <button data-tab="publish" type="button">发布包</button>
+        </nav>
+
+        <div class="tab-panel" id="tabPanel"></div>
+      </section>
+    </main>
+
+    <div class="image-preview-modal hidden" id="imagePreviewModal" role="dialog"
+      aria-modal="true" aria-label="图片预览">
+      <div class="image-preview-dialog">
+        <button class="image-preview-close" id="imagePreviewClose" type="button"
+          aria-label="关闭图片预览">×</button>
+        <img id="imagePreviewImage" alt="" />
+        <div>
+          <strong id="imagePreviewLabel">图片预览</strong>
+          <a class="primary small" id="imagePreviewDownload" href="" download>下载原图</a>
+        </div>
+      </div>
+    </div>
+    <div class="toast hidden" id="toast" role="status"></div>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,4 @@
+interface:
+  display_name: "视频故事创作 Agent"
+  short_description: "把创意转成可生产的短视频剧本、角色圣经、分镜与生成提示词"
+  default_prompt: "Use $create-video-storyboards to turn my idea into a production-ready short-video plan."
